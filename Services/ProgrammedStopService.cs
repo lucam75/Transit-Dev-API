@@ -36,7 +36,7 @@ namespace Transit_Dev_API_1.Services
 
         public List<PunctualityResponse> GetStopsByTime(decimal programmedTime)
         {
-            return _stops.Find<PunctualityResponse>(p => p.ProgrammedTime >= programmedTime).ToList();
+            return _stops.Find<PunctualityResponse>(p => p.ProgrammedTime == programmedTime).ToList();
         }
 
         public Buses GetBus(string bus_id)

@@ -66,7 +66,10 @@ namespace Transit_Dev_API_1.Controllers
                     Decimal hour = Convert.ToDecimal(now.ToString("HH"));
                     
                     decimal currentTime = hour + (minute/10);
-                    List<PunctualityResponse> stopsByTime = this._stopService.GetStopsByTime(currentTime);
+                    //hack to simulate an hour
+                    currentTime = Decimal.Parse("14.7");
+
+                    List<PunctualityResponse> stopsByTime = this._stopService.GetStopsByBusId(bus_id);
                     stopsByTime = stopsByTime.OrderBy(x => x.ProgrammedTime).ToList();
 
                     //Get bus data
@@ -76,7 +79,7 @@ namespace Transit_Dev_API_1.Controllers
                     response.bus_id = bus_id;
                     response.bus_license_plate = bus.license_plate;
                     response.next_stop["by_distance"] = JToken.FromObject(stopsByDistance.Find(x => x.DistanceFromOriginKm > distance_from_origin_km));
-                    response.next_stop["by_program"] = JToken.FromObject(stopsByTime.FirstOrDefault());
+                    response.next_stop["by_program"] = JToken.FromObject(stopsByTime.Find(x => x.ProgrammedTime >= currentTime));
 
                 }
             }
