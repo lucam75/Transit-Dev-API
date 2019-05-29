@@ -52,18 +52,35 @@ namespace Transit_Dev_API_1.Controllers
             {
                 if (data != null && data["bus_id"] != null)
                 {
+                    // Get parameters
                     string bus_id = Convert.ToString(data["bus_id"]);
                     decimal distance_from_origin_km = Convert.ToDecimal(data["distance_from_origin_km"].ToString());
-                    List<PunctualityResponse> stops = this._stopService.GetStopsByBusId(bus_id);
-                    stops = stops.OrderBy(x => x.DistanceFromOriginKm).ToList();
 
+                    //Get next stop by distance
+                    List<PunctualityResponse> stopsByDistance = this._stopService.GetStopsByBusId(bus_id);
+                    stopsByDistance = stopsByDistance.OrderBy(x => x.DistanceFromOriginKm).ToList();
+
+                    //Get next stop by time
+                    DateTime now = DateTime.Now;
+                    Decimal minute = Decimal.Parse(((now.Minute * 10 / 60)).ToString());
+                    Decimal hour = Convert.ToDecimal(now.ToString("HH"));
+                    
+                    decimal currentTime = hour + (minute/10);
+                    List<PunctualityResponse> stopsByTime = this._stopService.GetStopsByTime(currentTime);
+                    stopsByTime = stopsByTime.OrderBy(x => x.ProgrammedTime).ToList();
+
+                    //Get bus data
                     Buses bus = this._stopService.GetBus(bus_id);
 
+                    //Populate answer
                     response.bus_id = bus_id;
                     response.bus_license_plate = bus.license_plate;
-                    response.next_stop["by_distance"] = JToken.FromObject(stops.Find(x => x.DistanceFromOriginKm > distance_from_origin_km));
+                    response.next_stop["by_distance"] = JToken.FromObject(stopsByDistance.Find(x => x.DistanceFromOriginKm > distance_from_origin_km));
+                    response.next_stop["by_program"] = JToken.FromObject(stopsByTime.FirstOrDefault());
+
                 }
-            }catch(Exception e)
+            }
+            catch(Exception e)
             {
 
             }
