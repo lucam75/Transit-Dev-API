@@ -8,26 +8,36 @@ namespace Transit_Dev_API_1.Services
 {
     public class ProgrammedStopService
     {
-        private readonly IMongoCollection<ProgrammedStop> _stops;
+        private readonly IMongoCollection<PunctualityResponse> _stops;
+        private readonly IMongoCollection<Buses> _buses;
 
         public ProgrammedStopService(IConfiguration config)
         {
             var client = new MongoClient(config.GetConnectionString("TransitDb"));
             var database = client.GetDatabase("transit_test");
-            _stops = database.GetCollection<ProgrammedStop>("programmed_stops");
+            _stops = database.GetCollection<PunctualityResponse>("programmed_stops");
+            _buses = database.GetCollection<Buses>("buses");
         }
 
-        public List<ProgrammedStop> Get()
+        public List<PunctualityResponse> Get()
         {
             return _stops.Find(p => true).ToList();
         }
 
-        public ProgrammedStop Get(string id)
+        public PunctualityResponse Get(string id)
         {
-            return _stops.Find<ProgrammedStop>(p => p.Id == id).FirstOrDefault();
+            return _stops.Find<PunctualityResponse>(p => p.Id == id).FirstOrDefault();
         }
 
-        // TODO: Implement appropriate service method(s).
+        public List<PunctualityResponse> GetStopsByBusId(string bus_id)
+        {
+            return _stops.Find<PunctualityResponse>(p => p.BusId == bus_id).ToList();
+        }
+
+        public Buses GetBus(string bus_id)
+        {
+            return _buses.Find<Buses>(x => x.Id == bus_id).FirstOrDefault();
+        }
 
     }
 }

@@ -7,7 +7,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Transit_Dev_API_1.Models
 {
-    public class ProgrammedStop
+    public class PunctualityResponse
     {
         /// <summary>
         /// This entity's id.
